@@ -26,7 +26,7 @@ public class NettyTcpClient {
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
-                //TODO 路由转发 TCP 协议，设置 handler
+                // 路由转发 TCP 协议，设置 handler
                 ch.pipeline().addLast(new StringEncoder());
                 ch.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() {
                     @Override

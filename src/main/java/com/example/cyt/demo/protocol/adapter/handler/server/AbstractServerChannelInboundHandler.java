@@ -8,7 +8,6 @@ import com.example.cyt.demo.protocol.adapter.model.NetworkProtocolConfig;
 import com.example.cyt.demo.protocol.adapter.server.NettyProtocolAdapterServer;
 import com.example.cyt.demo.protocol.adapter.server.NettyProtocolAdapterServerManager;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,7 +43,7 @@ public abstract class AbstractServerChannelInboundHandler extends ChannelInbound
 
     protected ChannelAdapter channelAdapter;
     protected ChannelFuture connectFuture;
-    protected AtomicReference<ByteBuf> isFinishRouter = new AtomicReference<>(null);
+    protected AtomicReference<String> isFinishRouter = new AtomicReference<>(null);
     protected CountDownLatch countDownLatch = new CountDownLatch(1);
 
     public AbstractServerChannelInboundHandler(ChannelAdapter channelAdapter) {
@@ -72,18 +71,14 @@ public abstract class AbstractServerChannelInboundHandler extends ChannelInbound
             //路由转发
             router(respRecvBuf);
             //获取接出方响应
-            ByteBuf respSendBuf = Unpooled.copiedBuffer(isFinishRouter.get());
+            String respSend = isFinishRouter.get();
 
-            //TODO 接出方发送数据处理插件
-            //TODO 报文转换（转换为接入方需要的格式）
+            //TODO 报文转换（接出方数据格式转换为接入方需要的格式）
             //TODO 接入方发送数据处理插件
             //接入响应
-            byte[] respBytes = new byte[respSendBuf.readableBytes()];
-            respSendBuf.readBytes(respBytes);
-            String respStr = new String(respBytes, channelAdapter.getAdapterRespConfig().getCharsetEncoding());
-            System.out.println("new content:" + respStr);
+            System.out.println("new content:" + respSend);
             ByteBuf respConvertBuf = dataStructConvert(
-                    respStr, channelAdapter.getAdapterReqConfig().getCharsetEncoding(),
+                    respSend, channelAdapter.getAdapterReqConfig().getCharsetEncoding(),
                     channelAdapter.getAdapterReqConfig().getMessageDataStructConfig());
             return respConvertBuf;
         } catch (Exception e) {

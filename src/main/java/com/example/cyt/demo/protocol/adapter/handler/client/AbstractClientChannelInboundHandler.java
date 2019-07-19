@@ -18,12 +18,12 @@ import java.util.concurrent.atomic.AtomicReference;
  * @Date 2019-07-15 09:52
  */
 public class AbstractClientChannelInboundHandler extends ChannelInboundHandlerAdapter {
-    protected AtomicReference<ByteBuf> isFinishRouter;
+    protected AtomicReference<String> isFinishRouter;
     protected ChannelAdapter channelAdapter;
     protected CountDownLatch countDownLatch;
 
     public AbstractClientChannelInboundHandler(ChannelAdapter channelAdapter,
-                                               AtomicReference<ByteBuf> isFinishRouter, CountDownLatch countDownLatch) {
+                                               AtomicReference<String> isFinishRouter, CountDownLatch countDownLatch) {
         this.channelAdapter = channelAdapter;
         this.isFinishRouter = isFinishRouter;
         this.countDownLatch = countDownLatch;

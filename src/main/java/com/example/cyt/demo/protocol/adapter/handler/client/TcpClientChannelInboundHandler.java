@@ -3,7 +3,6 @@ package com.example.cyt.demo.protocol.adapter.handler.client;
 import com.example.cyt.demo.protocol.adapter.model.ChannelAdapter;
 import com.example.cyt.demo.protocol.adapter.model.MessageDataStructConfig;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -21,7 +20,7 @@ import static com.hsjry.packet.adaption.model.DataPacketModel.StructMode;
  */
 public class TcpClientChannelInboundHandler extends AbstractClientChannelInboundHandler {
     public TcpClientChannelInboundHandler(ChannelAdapter channelAdapter,
-                                          AtomicReference<ByteBuf> isFinishRouter, CountDownLatch countDownLatch) {
+                                          AtomicReference<String> isFinishRouter, CountDownLatch countDownLatch) {
         super(channelAdapter, isFinishRouter, countDownLatch);
     }
 
@@ -36,7 +35,8 @@ public class TcpClientChannelInboundHandler extends AbstractClientChannelInbound
             body = body.replaceFirst(dataStructConfig.getRecvPlaceholder(), "");
         }
         System.out.println("CONTENT:" + body);
-        isFinishRouter.set(Unpooled.copiedBuffer(body.getBytes()));
+        //TODO 接出方发送数据处理插件
+        isFinishRouter.set(body);
         countDownLatch.countDown();
         ctx.channel().closeFuture().addListeners(ChannelFutureListener.CLOSE);
     }
