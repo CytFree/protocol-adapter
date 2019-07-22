@@ -8,6 +8,8 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.CountDownLatch;
@@ -20,6 +22,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * @Date 2019-07-15 09:52
  */
 public class HttpClientChannelInboundHandler extends AbstractClientChannelInboundHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientChannelInboundHandler.class);
+
     public HttpClientChannelInboundHandler(ChannelAdapter channelAdapter,
                                            AtomicReference<String> isFinishRouter, CountDownLatch countDownLatch) {
         super(channelAdapter, isFinishRouter, countDownLatch);
@@ -28,12 +32,12 @@ public class HttpClientChannelInboundHandler extends AbstractClientChannelInboun
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         FullHttpResponse response = (FullHttpResponse) msg;
-        System.out.println("CONTENT_TYPE:" + response.headers().get(HttpHeaderNames.CONTENT_TYPE));
-        System.out.println(Thread.currentThread().getName() + "：" + isFinishRouter.toString() + "-----" + countDownLatch.toString());
+        LOGGER.info("CONTENT_TYPE:" + response.headers().get(HttpHeaderNames.CONTENT_TYPE));
+        LOGGER.info(Thread.currentThread().getName() + "：" + isFinishRouter.toString() + "-----" + countDownLatch.toString());
 
         String charsetName = channelAdapter.getAdapterRespConfig().getCharsetEncoding();
         ByteBuf buf = response.content();
-        System.out.println("Len: " + buf.readableBytes() + "\n" + "CONTENT:" + buf.toString(Charset.forName(charsetName)));
+        LOGGER.info("Len: " + buf.readableBytes() + "\n" + "CONTENT:" + buf.toString(Charset.forName(charsetName)));
         MessageDataStructConfig dataStructConfig = channelAdapter.getAdapterRespConfig().getMessageDataStructConfig();
         //响应数据结构
         DataPacketModel.StructMode structMode = dataStructConfig.getSendStructMode();

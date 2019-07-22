@@ -6,6 +6,8 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
@@ -19,6 +21,8 @@ import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
  */
 @Data
 public class HttpServerChannelInboundHandler extends AbstractServerChannelInboundHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerChannelInboundHandler.class);
+    
     public HttpServerChannelInboundHandler(ChannelAdapter channelAdapter) {
         super(channelAdapter);
     }
@@ -30,7 +34,7 @@ public class HttpServerChannelInboundHandler extends AbstractServerChannelInboun
         byte[] reqContent = new byte[content.readableBytes()];
         content.readBytes(reqContent);
         String strContent = new String(reqContent);
-        System.out.println(Thread.currentThread().getName() + "--Http Req Content:" + strContent);
+        LOGGER.info(Thread.currentThread().getName() + "--Http Req Content:" + strContent);
         //TODO 接入方接收数据处理插件
         return strContent;
     }

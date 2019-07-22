@@ -6,6 +6,8 @@ import com.example.cyt.demo.protocol.adapter.server.NettyProtocolAdapterServerMa
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +19,8 @@ import java.util.concurrent.TimeUnit;
  * @Date 2019-07-18 17:47
  */
 public class ConnectionListener implements ChannelFutureListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionListener.class);
+
     private ChannelAdapter channelAdapter;
     private CountDownLatch countDownLatch;
 
@@ -30,15 +34,15 @@ public class ConnectionListener implements ChannelFutureListener {
         String adapterCode = channelAdapter.getAdapterCode();
         if (!channelFuture.isSuccess()) {
             final EventLoop loop = channelFuture.channel().eventLoop();
-            System.err.println(adapterCode + "适配器，开始重连接出方...");
+            LOGGER.error(adapterCode + "适配器，开始重连接出方...");
             NettyProtocolAdapterServer nettyServer = NettyProtocolAdapterServerManager.activeServer.get(adapterCode);
             if (nettyServer != null) {
                 loop.schedule(() -> nettyServer.respChannelActive(channelAdapter, countDownLatch), 1L, TimeUnit.SECONDS);
             } else {
-                System.err.println(adapterCode + "适配器对应的Netty服务已停止.");
+                LOGGER.error(adapterCode + "适配器对应的Netty服务已停止.");
             }
         } else {
-            System.out.println(adapterCode + "适配器，连接接出方成功...");
+            LOGGER.info(adapterCode + "适配器，连接接出方成功...");
             if (countDownLatch != null) {
                 countDownLatch.countDown();
             }

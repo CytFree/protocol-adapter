@@ -1,6 +1,8 @@
 package com.example.cyt.demo.protocol.adapter.server;
 
 import io.netty.channel.ChannelFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import java.util.Map;
  */
 @Component
 public class NettyProtocolAdapterServerManager implements InitializingBean {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyProtocolAdapterServerManager.class);
+
     public static Map<String, NettyProtocolAdapterServer> activeServer = new HashMap<>(8);
     public static Map<String, ChannelFuture> routerClient = new HashMap<>(8);
 
@@ -38,7 +42,7 @@ public class NettyProtocolAdapterServerManager implements InitializingBean {
         startServer();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             for (String key : activeServer.keySet()) {
-                System.out.println(key + "适配器开始stopServer。。。");
+                LOGGER.info(key + "适配器开始stopServer。。。");
                 activeServer.get(key).stopServer();
             }
             activeServer.clear();

@@ -7,6 +7,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author by CYT
@@ -16,6 +18,8 @@ import lombok.Data;
  */
 @Data
 public class TcpServerChannelInboundHandler extends AbstractServerChannelInboundHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TcpServerChannelInboundHandler.class);
+
     public TcpServerChannelInboundHandler(ChannelAdapter channelAdapter) {
         super(channelAdapter);
     }
@@ -29,7 +33,7 @@ public class TcpServerChannelInboundHandler extends AbstractServerChannelInbound
         if (DataPacketModel.StructMode.PLACEHOLDER_DATA.equals(structMode)) {
             body = body.replaceFirst(dataStructConfig.getRecvPlaceholder(), "");
         }
-        System.out.println("Tcp Req Content:" + body);
+        LOGGER.info("Tcp Req Content:" + body);
         //TODO 接入方接收数据处理插件
         return body;
     }

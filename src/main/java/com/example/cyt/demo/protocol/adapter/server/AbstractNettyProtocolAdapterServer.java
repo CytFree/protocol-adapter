@@ -24,6 +24,8 @@ import io.netty.handler.codec.http.HttpResponseDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.concurrent.Future;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.CountDownLatch;
@@ -36,6 +38,8 @@ import java.util.concurrent.CountDownLatch;
  */
 @Data
 public abstract class AbstractNettyProtocolAdapterServer implements NettyProtocolAdapterServer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionListener.class);
+
     /**
      * 渠道适配器
      */
@@ -86,7 +90,7 @@ public abstract class AbstractNettyProtocolAdapterServer implements NettyProtoco
         ChannelFuture channelFuture = serverBootstrap.bind(networkProtocolConfig.getPort()).sync();
         if (channelFuture.isSuccess()) {
             isRunning = true;
-            System.out.println(getName() + "服务启动 成功，监控端口：" + networkProtocolConfig.getPort());
+            LOGGER.info(getName() + "服务启动 成功，监控端口：" + networkProtocolConfig.getPort());
         } else {
             throw new RuntimeException(getName() + "服务启动 失败，监控端口：" + networkProtocolConfig.getPort());
         }
@@ -98,7 +102,7 @@ public abstract class AbstractNettyProtocolAdapterServer implements NettyProtoco
             init();
             respChannelActive(channelAdapter, null);
         } catch (InterruptedException e) {
-            System.out.println(getName() + "服务启动 异常---------------" + e);
+            LOGGER.info(getName() + "服务启动 异常---------------" + e);
             return false;
         }
         return true;
@@ -107,28 +111,28 @@ public abstract class AbstractNettyProtocolAdapterServer implements NettyProtoco
     @Override
     public synchronized boolean stopServer() {
         if (!isRunning) {
-            System.out.println(this.getName() + " 未启动 .");
+            LOGGER.info(this.getName() + " 未启动 .");
             return false;
         }
         try {
             Future future = workers.shutdownGracefully().await();
             if (!future.isSuccess()) {
-                System.out.println(getName() + "-workerGroup 无法正常停止: " + future.cause());
+                LOGGER.info(getName() + "-workerGroup 无法正常停止: " + future.cause());
             }
             future = boots.shutdownGracefully().await();
             if (!future.isSuccess()) {
-                System.out.println(getName() + "-bootstrapGroup 无法正常停止: " + future.cause());
+                LOGGER.info(getName() + "-bootstrapGroup 无法正常停止: " + future.cause());
             }
 
             future = routerWorkers.shutdownGracefully().await();
             if (!future.isSuccess()) {
-                System.out.println(getName() + "-routerWorkers 无法正常停止: " + future.cause());
+                LOGGER.info(getName() + "-routerWorkers 无法正常停止: " + future.cause());
             }
         } catch (Exception e) {
-            System.out.println(getName() + "服务停止异常：" + e);
+            LOGGER.info(getName() + "服务停止异常：" + e);
             return false;
         }
-        System.out.println(getName() + "服务已经停止...");
+        LOGGER.info(getName() + "服务已经停止...");
         isRunning = false;
         return true;
     }
@@ -174,7 +178,7 @@ public abstract class AbstractNettyProtocolAdapterServer implements NettyProtoco
             bootstrap.connect(networkProtocolConfig.getIp(), networkProtocolConfig.getPort())
                     .addListeners(new ConnectionListener(channelAdapter, countDownLatch));
         } catch (Exception e) {
-            System.out.println(adapterCode + "适配器，连接接出方失败：" + e);
+            LOGGER.error(adapterCode + "适配器，连接接出方失败：" + e);
         }
     }
 

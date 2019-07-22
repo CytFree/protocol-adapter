@@ -14,6 +14,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
@@ -38,6 +40,8 @@ import static com.example.cyt.demo.protocol.adapter.util.MessageDataStructConver
  */
 @Data
 public abstract class AbstractServerChannelInboundHandler extends ChannelInboundHandlerAdapter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientChannelInboundHandler.class);
+
     private static final String HTTP_CLIENT_CHANNEL_HANDLER = "HttpClientChannelInboundHandler";
     private static final String TCP_CLIENT_CHANNEL_HANDLER = "TcpClientChannelInboundHandler";
 
@@ -76,7 +80,7 @@ public abstract class AbstractServerChannelInboundHandler extends ChannelInbound
             //TODO 报文转换（接出方数据格式转换为接入方需要的格式）
             //TODO 接入方发送数据处理插件
             //接入响应
-            System.out.println("new content:" + respSend);
+            LOGGER.info("new content:" + respSend);
             ByteBuf respConvertBuf = dataStructConvert(
                     respSend, channelAdapter.getAdapterReqConfig().getCharsetEncoding(),
                     channelAdapter.getAdapterReqConfig().getMessageDataStructConfig());
@@ -108,7 +112,7 @@ public abstract class AbstractServerChannelInboundHandler extends ChannelInbound
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        System.out.println(cause.toString());
+        LOGGER.error(cause.toString());
         ctx.close();
     }
 
@@ -160,11 +164,11 @@ public abstract class AbstractServerChannelInboundHandler extends ChannelInbound
             if (isFinishRouter.get() == null) {
                 throw new RuntimeException("路由转发，接出方响应超时");
             } else {
-                System.out.println("路由转发，完成响应");
+                LOGGER.info("路由转发，完成响应");
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            //TODO 异常处理
+            LOGGER.error("路由转发异常: ", e);
+            isFinishRouter.set("路由转发异常：" + e.getMessage());
         }
     }
 
