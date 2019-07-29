@@ -42,7 +42,7 @@ import static com.hsjry.packet.channel.util.MessageDataStructConvert.dataStructC
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractServerChannelInboundHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientChannelInboundHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServerChannelInboundHandler.class);
 
     private static final String HTTP_CLIENT_CHANNEL_HANDLER = "HttpClientChannelInboundHandler";
     private static final String TCP_CLIENT_CHANNEL_HANDLER = "TcpClientChannelInboundHandler";
@@ -73,7 +73,7 @@ public abstract class AbstractServerChannelInboundHandler extends ChannelInbound
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOGGER.error(cause.toString());
+        LOGGER.error("连接异常关闭：", cause);
         ctx.close();
     }
 

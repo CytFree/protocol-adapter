@@ -1,18 +1,41 @@
 package com.hsjry.packet.channel;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
+@RunWith(JUnit4.class)
 public class TcpReqClient {
-    public static void main(String[] args) throws IOException {
-       for (int i = 0; i <= 1; i++) {
-           test();
-       }
+    @Test
+    public void testString() {
+        String sss = "  0001234567890  ";
+        sss = sss.replaceAll(" ", "");
+        int lastIndex = 0;
+        for (int i=0;i<sss.length();i++) {
+            char c = sss.charAt(i);
+            if (c != '0') {
+                lastIndex = i;
+                break;
+            }
+        }
+        sss = sss.substring(lastIndex);
+        System.out.println(Integer.parseInt(sss));
+        byte[] bytes = sss.getBytes();
+        System.out.println(bytes.length);
     }
 
-    public static void test () throws IOException {
+    public static void main(String[] args) throws IOException {
+        for (int i = 0; i <= 1; i++) {
+            test();
+        }
+    }
+
+    public static void test() throws IOException {
         int port = 8020;
         Socket socket = new Socket("127.0.0.1", port);
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());

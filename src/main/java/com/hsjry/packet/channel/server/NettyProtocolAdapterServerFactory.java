@@ -19,10 +19,10 @@ public class NettyProtocolAdapterServerFactory {
         List<NettyProtocolAdapterServer> adapterServerList = new ArrayList<>();
         ChannelAdapterConfig channelAdapter1 =
                 createTestChannelAdapter(8020, 9002,
-                        ProtocolTypeEnum.TCP.getCode(), ProtocolTypeEnum.HTTP.getCode(), "appAdapter001");
+                        ProtocolTypeEnum.HTTP.getCode(), ProtocolTypeEnum.HTTP.getCode(), "appAdapter001");
         ChannelAdapterConfig channelAdapter2 =
                 createTestChannelAdapter(8030, 9012,
-                        ProtocolTypeEnum.TCP.getCode(), ProtocolTypeEnum.TCP.getCode(), "appAdapter002");
+                        ProtocolTypeEnum.HTTP.getCode(), ProtocolTypeEnum.TCP.getCode(), "appAdapter002");
 
         NettyProtocolAdapterServer nettyServer1 = createServer(channelAdapter1);
         NettyProtocolAdapterServer nettyServer2 = createServer(channelAdapter2);
@@ -70,11 +70,11 @@ public class NettyProtocolAdapterServerFactory {
                 .build();
 
         MessageDataStructConfig reqDataStructConfig = MessageDataStructConfig.builder()
-//                .recvLengthMode(DataPacketModel.LengthMode.PLACEHOLDER_DATA)
-//                .recvLengthZoneLength(4)
-//                .recvPlaceholder("000000")
-//                .recvStructMode(DataPacketModel.StructMode.PLACEHOLDER_LENGTH_DATA)
-                .recvStructMode(DataPacketModel.StructMode.DATA)
+                .recvLengthMode(DataPacketModel.LengthMode.PLACEHOLDER_DATA)
+                .recvLengthZoneLength(4)
+                .recvPlaceholder("00")
+                .recvStructMode(DataPacketModel.StructMode.PLACEHOLDER_LENGTH_DATA)
+//                .recvStructMode(DataPacketModel.StructMode.DATA)
 
                 .sendStructMode(DataPacketModel.StructMode.LENGTH_PLACEHOLDER_DATA)
                 .sendPlaceholder("BBBBB")

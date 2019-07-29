@@ -48,7 +48,7 @@ public class LengthFieldBasedFrameDecoderUtil {
 
     private static LengthFieldBasedFrameDecoder lengthDataDecoder(
             MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
-        int maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset = 0, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
+        Integer maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset = 0, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
         DataPacketModel.LengthMode lengthMode;
         if (boundSide == 0) {
             lengthFieldLength = dataStructConfig.getRecvLengthZoneLength();
@@ -78,8 +78,8 @@ public class LengthFieldBasedFrameDecoderUtil {
 
     private static LengthFieldBasedFrameDecoder lengthPlaceHolderDataDecoder(
             MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
-        int maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset = 0, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
-        int placeHolderLen;
+        Integer maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset = 0, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
+        Integer placeHolderLen;
         DataPacketModel.LengthMode lengthMode;
         if (boundSide == 0) {
             placeHolderLen = dataStructConfig.getRecvPlaceholder().length();
@@ -118,8 +118,8 @@ public class LengthFieldBasedFrameDecoderUtil {
 
     private static LengthFieldBasedFrameDecoder placeHolderLengthDataDecoder(
             MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
-        int maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
-        int placeHolderLen;
+        Integer maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
+        Integer placeHolderLen;
         DataPacketModel.LengthMode lengthMode;
         if (boundSide == 0) {
             lengthMode = dataStructConfig.getRecvLengthMode();

@@ -23,7 +23,7 @@ public class MessageDataStructConvert {
         //数据长度域结构
         DataPacketModel.LengthMode lengthMode;
         //数据长度域的长度
-        int lengthZoneLength;
+        Integer lengthZoneLength;
         //占位符
         String placeHolder;
         //数据长度
