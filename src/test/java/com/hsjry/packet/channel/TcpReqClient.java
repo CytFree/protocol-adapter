@@ -16,7 +16,7 @@ public class TcpReqClient {
         String sss = "  0001234567890  ";
         sss = sss.replaceAll(" ", "");
         int lastIndex = 0;
-        for (int i=0;i<sss.length();i++) {
+        for (int i = 0; i < sss.length(); i++) {
             char c = sss.charAt(i);
             if (c != '0') {
                 lastIndex = i;
@@ -30,18 +30,29 @@ public class TcpReqClient {
     }
 
     public static void main(String[] args) throws IOException {
-        for (int i = 0; i <= 1; i++) {
+        for (int i = 0; i <= 3; i++) {
             test();
         }
     }
 
     public static void test() throws IOException {
-        int port = 8020;
+        int port = 8030;
         Socket socket = new Socket("127.0.0.1", port);
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-        byte[] body = "你好a，好，中国你好啊你好as哈哈你好a，好，中国你好啊你好as哈哈你好a，好，中国你好啊你好as哈哈你好a，好，中国你好啊你好as哈哈你好a，好你好a，好，中国你好啊你好as哈哈你好a，好，中国你好啊你好as哈哈你好a，好，中国你好啊你好as哈哈saaaa呵呵".getBytes();
-//        outputStream.write("000000".getBytes());
-//        outputStream.writeInt(body.length + 6);
+        byte[] body = "cyt你好a，好，中国你as哈哈a，好，中国你好啊你好as哈哈你好a，好，s哈哈你好a，好，中国你好啊你好as哈哈你好a，好，中国你好啊你好as哈哈saaaa呵aaa呵".getBytes();
+        outputStream.write("000000".getBytes());
+        int lengthZoneLen = body.length + 6;
+//        outputStream.writeInt(lengthZoneLen);
+        StringBuffer stringBuffer = new StringBuffer();
+        String str = String.valueOf(lengthZoneLen);
+        stringBuffer.append(str);
+        if (str.length() < 4) {
+            int sub = 4 - str.length();
+            for (int i=0;i<sub;i++) {
+                stringBuffer.append(" ");
+            }
+        }
+        outputStream.write(stringBuffer.toString().getBytes());
         outputStream.write(body);
         //关闭输出流，不再发送消息（如果再需要发送消息，就需要再重新socket）
         socket.shutdownOutput();

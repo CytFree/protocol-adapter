@@ -6,7 +6,7 @@ import com.hsjry.packet.channel.model.MessageDataStructConfig;
 import com.hsjry.packet.channel.util.LengthFieldBasedFrameDecoderUtil;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 
 import java.nio.charset.Charset;
@@ -27,10 +27,10 @@ public class TcpServerChannelInitializer extends ChannelInitializer<SocketChanne
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         MessageDataStructConfig dataStructConfig = channelAdapter.getAdapterReqConfig().getMessageDataStructConfig();
-        LengthFieldBasedFrameDecoder lengthFieldBasedFrameDecoder =
+        ByteToMessageDecoder byteToMessageDecoder =
                 LengthFieldBasedFrameDecoderUtil.createLengthFieldBasedFrameDecoder(dataStructConfig);
-        if (lengthFieldBasedFrameDecoder != null) {
-            socketChannel.pipeline().addLast(lengthFieldBasedFrameDecoder);
+        if (byteToMessageDecoder != null) {
+            socketChannel.pipeline().addLast(byteToMessageDecoder);
         }
         socketChannel.pipeline().addLast(new StringDecoder(Charset.forName(channelAdapter.getAdapterReqConfig().getCharsetEncoding())));
         socketChannel.pipeline().addLast(new TcpServerChannelInboundHandler(channelAdapter));

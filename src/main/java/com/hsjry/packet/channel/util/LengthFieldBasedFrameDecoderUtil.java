@@ -1,7 +1,10 @@
 package com.hsjry.packet.channel.util;
 
 import com.hsjry.packet.adaption.model.DataPacketModel;
+import com.hsjry.packet.channel.handler.server.CustomizeLengthFieldDecoder;
 import com.hsjry.packet.channel.model.MessageDataStructConfig;
+import com.hsjry.packet.channel.server.NettyProtocolAdapterServerFactory;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 /**
@@ -16,7 +19,8 @@ public class LengthFieldBasedFrameDecoderUtil {
      *
      * @return
      */
-    public static LengthFieldBasedFrameDecoder createLengthFieldBasedFrameDecoder(MessageDataStructConfig dataStructConfig) {
+    public static ByteToMessageDecoder createLengthFieldBasedFrameDecoder(MessageDataStructConfig dataStructConfig) {
+        String lengthZoneLengthType = dataStructConfig.getLengthZoneLengthType();
         //报文结构模式
         DataPacketModel.StructMode structMode;
         Integer boundSide = dataStructConfig.getBoundSide();
@@ -34,20 +38,20 @@ public class LengthFieldBasedFrameDecoderUtil {
             return null;
         } else if (DataPacketModel.StructMode.LENGTH_DATA.equals(structMode)) {
             //长度 + 数据
-            return lengthDataDecoder(dataStructConfig, structMode, boundSide);
+            return lengthDataDecoder(lengthZoneLengthType, dataStructConfig, structMode, boundSide);
         } else if (DataPacketModel.StructMode.LENGTH_PLACEHOLDER_DATA.equals(structMode)) {
             //长度 + 占位符 + 数据
-            return lengthPlaceHolderDataDecoder(dataStructConfig, structMode, boundSide);
+            return lengthPlaceHolderDataDecoder(lengthZoneLengthType, dataStructConfig, structMode, boundSide);
         } else if (DataPacketModel.StructMode.PLACEHOLDER_LENGTH_DATA.equals(structMode)) {
             //占位符 + 长度 + 数据
-            return placeHolderLengthDataDecoder(dataStructConfig, structMode, boundSide);
+            return placeHolderLengthDataDecoder(lengthZoneLengthType, dataStructConfig, structMode, boundSide);
         } else {
             throw new RuntimeException("不支持的报文数据结构：" + structMode);
         }
     }
 
-    private static LengthFieldBasedFrameDecoder lengthDataDecoder(
-            MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
+    private static ByteToMessageDecoder lengthDataDecoder(
+            String lengthZoneLengthType, MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
         Integer maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset = 0, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
         DataPacketModel.LengthMode lengthMode;
         if (boundSide == 0) {
@@ -73,11 +77,12 @@ public class LengthFieldBasedFrameDecoderUtil {
                 throw new RuntimeException("数据结构[" + structMode + "]不支持该数据长度域模式：" + lengthMode);
         }
         initialBytesToStrip = lengthFieldLength;
-        return new LengthFieldBasedFrameDecoder(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
+        return createByteToMessageDecoder(lengthZoneLengthType,
+                maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
     }
 
-    private static LengthFieldBasedFrameDecoder lengthPlaceHolderDataDecoder(
-            MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
+    private static ByteToMessageDecoder lengthPlaceHolderDataDecoder(
+            String lengthZoneLengthType, MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
         Integer maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset = 0, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
         Integer placeHolderLen;
         DataPacketModel.LengthMode lengthMode;
@@ -113,11 +118,12 @@ public class LengthFieldBasedFrameDecoderUtil {
             default:
                 throw new RuntimeException("数据结构[" + structMode + "]不支持该数据长度域模式：" + lengthMode);
         }
-        return new LengthFieldBasedFrameDecoder(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
+        return createByteToMessageDecoder(lengthZoneLengthType,
+                maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
     }
 
-    private static LengthFieldBasedFrameDecoder placeHolderLengthDataDecoder(
-            MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
+    private static ByteToMessageDecoder placeHolderLengthDataDecoder(
+            String lengthZoneLengthType, MessageDataStructConfig dataStructConfig, DataPacketModel.StructMode structMode, Integer boundSide) {
         Integer maxFrameLength = Integer.MAX_VALUE, lengthFieldOffset, lengthFieldLength, lengthAdjustment = 0, initialBytesToStrip;
         Integer placeHolderLen;
         DataPacketModel.LengthMode lengthMode;
@@ -157,6 +163,19 @@ public class LengthFieldBasedFrameDecoderUtil {
             default:
                 throw new RuntimeException("数据结构[" + structMode + "]不支持该数据长度域模式：" + lengthMode);
         }
-        return new LengthFieldBasedFrameDecoder(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
+        return createByteToMessageDecoder(lengthZoneLengthType,
+                maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
+    }
+
+    private static ByteToMessageDecoder createByteToMessageDecoder(String lengthZoneLengthType,
+                                Integer maxFrameLength, Integer lengthFieldOffset,
+                                Integer lengthFieldLength, Integer lengthAdjustment, Integer initialBytesToStrip) {
+        if (NettyProtocolAdapterServerFactory.LengthZoneLengthType.BYTE.name().equals(lengthZoneLengthType)) {
+            return new LengthFieldBasedFrameDecoder(maxFrameLength, lengthFieldOffset,
+                    lengthFieldLength, lengthAdjustment, initialBytesToStrip);
+        } else {
+            return new CustomizeLengthFieldDecoder(maxFrameLength, lengthFieldOffset,
+                    lengthFieldLength, lengthAdjustment, initialBytesToStrip);
+        }
     }
 }

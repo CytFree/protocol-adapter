@@ -3,6 +3,7 @@ package com.hsjry.packet.channel.server;
 import com.hsjry.packet.adaption.model.DataPacketModel;
 import com.hsjry.packet.channel.enums.ProtocolTypeEnum;
 import com.hsjry.packet.channel.model.*;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +14,30 @@ import java.util.List;
  * @Description TODO
  * @Date 2019-07-12 14:18
  */
+@Data
 public class NettyProtocolAdapterServerFactory {
+    /**
+     * 长度域的长度类型
+     *
+     * @see LengthZoneLengthType
+     */
+    private String lengthZoneLengthType = LengthZoneLengthType.STRING.name();
+
+    public NettyProtocolAdapterServerFactory() {
+    }
+
+    public NettyProtocolAdapterServerFactory(String lengthZoneLengthType) {
+        this.lengthZoneLengthType = lengthZoneLengthType;
+    }
 
     public List<NettyProtocolAdapterServer> createAllServer() {
         List<NettyProtocolAdapterServer> adapterServerList = new ArrayList<>();
         ChannelAdapterConfig channelAdapter1 =
                 createTestChannelAdapter(8020, 9002,
-                        ProtocolTypeEnum.HTTP.getCode(), ProtocolTypeEnum.HTTP.getCode(), "appAdapter001");
+                        ProtocolTypeEnum.TCP.getCode(), ProtocolTypeEnum.HTTP.getCode(), "appAdapter001");
         ChannelAdapterConfig channelAdapter2 =
                 createTestChannelAdapter(8030, 9012,
-                        ProtocolTypeEnum.HTTP.getCode(), ProtocolTypeEnum.TCP.getCode(), "appAdapter002");
+                        ProtocolTypeEnum.TCP.getCode(), ProtocolTypeEnum.TCP.getCode(), "appAdapter002");
 
         NettyProtocolAdapterServer nettyServer1 = createServer(channelAdapter1);
         NettyProtocolAdapterServer nettyServer2 = createServer(channelAdapter2);
@@ -62,8 +77,8 @@ public class NettyProtocolAdapterServerFactory {
      *
      * @return
      */
-    private static ChannelAdapterConfig createTestChannelAdapter(int reqPort, int respPort,
-                                                                 String reqProtocolType, String respProtocolType, String adapterCode) {
+    private ChannelAdapterConfig createTestChannelAdapter(int reqPort, int respPort,
+                                                          String reqProtocolType, String respProtocolType, String adapterCode) {
         NetworkProtocolConfig reqNetworkProtocolConfig = NetworkProtocolConfig.builder()
                 .protocolType(reqProtocolType)
                 .port(reqPort)
@@ -72,7 +87,7 @@ public class NettyProtocolAdapterServerFactory {
         MessageDataStructConfig reqDataStructConfig = MessageDataStructConfig.builder()
                 .recvLengthMode(DataPacketModel.LengthMode.PLACEHOLDER_DATA)
                 .recvLengthZoneLength(4)
-                .recvPlaceholder("00")
+                .recvPlaceholder("000000")
                 .recvStructMode(DataPacketModel.StructMode.PLACEHOLDER_LENGTH_DATA)
 //                .recvStructMode(DataPacketModel.StructMode.DATA)
 
@@ -80,7 +95,9 @@ public class NettyProtocolAdapterServerFactory {
                 .sendPlaceholder("BBBBB")
                 .sendLengthMode(DataPacketModel.LengthMode.TOTAL)
                 .sendLengthZoneLength(4)
+                .sendLengthZoneFillMode(DataPacketModel.LengthZoneFillMode.RIGHT_BLANK)
                 .boundSide(0)
+                .lengthZoneLengthType(lengthZoneLengthType)
                 .build();
 
         ChannelAdapterReqConfig reqConfig = ChannelAdapterReqConfig.builder()
@@ -101,12 +118,14 @@ public class NettyProtocolAdapterServerFactory {
                 .sendLengthZoneLength(4)
                 .sendPlaceholder("000000")
                 .sendStructMode(DataPacketModel.StructMode.LENGTH_DATA)
+                .sendLengthZoneFillMode(DataPacketModel.LengthZoneFillMode.LEFT_ZERO)
 
                 .recvStructMode(DataPacketModel.StructMode.LENGTH_PLACEHOLDER_DATA)
                 .recvPlaceholder("AAAAA")
                 .recvLengthMode(DataPacketModel.LengthMode.TOTAL)
                 .recvLengthZoneLength(4)
                 .boundSide(1)
+                .lengthZoneLengthType(LengthZoneLengthType.BYTE.name())
                 .build();
 
         ChannelAdapterRespConfig respConfig = ChannelAdapterRespConfig.builder()
@@ -122,5 +141,21 @@ public class NettyProtocolAdapterServerFactory {
                 .adapterRespConfig(respConfig)
                 .build();
         return channelAdapter;
+    }
+
+    /**
+     * 长度域的长度类型枚举
+     */
+    public enum LengthZoneLengthType {
+        /**
+         * 字节类型
+         */
+        BYTE,
+
+        /**
+         * 字符串类型
+         */
+        STRING,
+        ;
     }
 }

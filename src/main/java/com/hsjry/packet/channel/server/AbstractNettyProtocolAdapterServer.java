@@ -17,7 +17,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestEncoder;
 import io.netty.handler.codec.http.HttpResponseDecoder;
@@ -163,10 +163,10 @@ public abstract class AbstractNettyProtocolAdapterServer implements NettyProtoco
                 protected void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline().addLast(new StringEncoder(Charset.forName(respConfig.getCharsetEncoding())));
                     MessageDataStructConfig dataStructConfig = channelAdapter.getAdapterRespConfig().getMessageDataStructConfig();
-                    LengthFieldBasedFrameDecoder lengthFieldBasedFrameDecoder =
+                    ByteToMessageDecoder byteToMessageDecoder =
                             LengthFieldBasedFrameDecoderUtil.createLengthFieldBasedFrameDecoder(dataStructConfig);
-                    if (lengthFieldBasedFrameDecoder != null) {
-                        ch.pipeline().addLast(lengthFieldBasedFrameDecoder);
+                    if (byteToMessageDecoder != null) {
+                        ch.pipeline().addLast(byteToMessageDecoder);
                     }
                 }
             });

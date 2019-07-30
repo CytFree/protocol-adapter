@@ -1,6 +1,7 @@
 package com.hsjry.packet.channel.model;
 
 import com.hsjry.packet.adaption.model.DataPacketModel;
+import com.hsjry.packet.channel.server.NettyProtocolAdapterServerFactory;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
@@ -83,4 +84,11 @@ public class MessageDataStructConfig implements Serializable {
      * 插件
      */
     private String sendPlugin;
+
+    /**
+     * 长度域的长度类型
+     *
+     * @see NettyProtocolAdapterServerFactory.LengthZoneLengthType
+     */
+    private String lengthZoneLengthType;
 }
